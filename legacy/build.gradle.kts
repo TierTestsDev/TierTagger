@@ -56,6 +56,7 @@ tasks {
 
     jar {
         from(rootDir.resolve("../LICENSE")) { rename { "LICENSE_$modId" } }
+        destinationDirectory = layout.buildDirectory.dir("devlibs")
     }
 }
 

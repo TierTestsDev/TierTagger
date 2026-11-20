@@ -50,7 +50,5 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: forge
-          path: |
-            legacy/build/libs/*.jar
-            !legacy/build/libs/*-dev.jar
+          path: legacy/build/libs/*.jar
           if-no-files-found: error

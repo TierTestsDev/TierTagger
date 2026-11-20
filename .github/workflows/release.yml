@@ -50,4 +50,3 @@ jobs:
           files: |
             versions/*/build/libs/*.jar
             legacy/build/libs/*.jar
-            !legacy/build/libs/*-dev.jar
