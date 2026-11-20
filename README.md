@@ -22,11 +22,11 @@ Supported tier lists:
 
 | Default key | Action |
 |---|---|
-| `N` | Open settings |
+| `I` | Open settings |
 | `U` | Look up the nearest player |
-| `C` | Look up the last player you hit |
+| `Z` | Look up the last player you hit |
 
-On Forge 1.8.9, `/tiertag` opens the settings and `/tiertag <name>` searches a player. On Fabric, the settings screen is also available from [Mod Menu](https://modrinth.com/mod/modmenu).
+`/tiertagger` opens the settings and `/tiertagger <name>` searches a player. The settings are also in [Mod Menu](https://modrinth.com/mod/modmenu) on Fabric, Forge's mod list, and the OneConfig menu in [OneClient](https://polyfrost.org/projects/oneclient).
 
 ## Supported versions
 

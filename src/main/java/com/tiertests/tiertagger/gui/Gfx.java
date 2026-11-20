@@ -33,6 +33,13 @@ public final class Gfx {
         this.font = Minecraft.getInstance().font;
     }
 
+    //? if >=26.1 {
+    public GuiGraphicsExtractor raw() {
+    //?} else
+    /*public GuiGraphics raw() {*/
+        return g;
+    }
+
     public Font font() {
         return font;
     }

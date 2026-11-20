@@ -20,7 +20,19 @@ sourceSets.main {
     java.srcDir("../core/src/main/java")
 }
 
+val oneconfig: SourceSet by sourceSets.creating {
+    compileClasspath += sourceSets.main.get().compileClasspath + sourceSets.main.get().output
+}
+
+configurations.named("oneconfigCompileClasspath") {
+    attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+}
+
 apply(from = rootDir.resolve("../gradle/legacy-font.gradle.kts"))
+
+repositories {
+    maven("https://repo.polyfrost.org/releases") { name = "Polyfrost" }
+}
 
 dependencies {
     minecraft("com.mojang:minecraft:$minecraftVersion")
@@ -28,6 +40,11 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
 
     ploceus.dependOsl(oslVersion)
+
+
+    // OneConfig needs Java 21, so its page is compiled on its own and only loaded when OneConfig is installed.
+    "oneconfigCompileOnly"("org.polyfrost.oneconfig:config:${property("oneconfig_version")}") { isTransitive = false }
+    "oneconfigCompileOnly"("org.polyfrost.oneconfig:config-impl:${property("oneconfig_version")}") { isTransitive = false }
 }
 
 java {
@@ -47,7 +64,12 @@ tasks {
         filesMatching("fabric.mod.json") { expand(props) }
     }
 
+    named<JavaCompile>("compileOneconfigJava") {
+        options.release = 21
+    }
+
     jar {
+        from(oneconfig.output)
         val licenseName = "LICENSE_$modId"
         from(rootDir.resolve("../LICENSE")) { rename { licenseName } }
     }

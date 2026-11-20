@@ -2,12 +2,12 @@ package com.tiertests.tiertagger.core.config;
 
 /** Which ranking a tag picks for a player. */
 public enum DisplayMode {
-    SELECTED_OR_BEST("Selected, else best"),
-    BEST("Best tier"),
-    SELECTED("Selected only"),
-    RANK("Overall rank"),
-    SELECTED_ANY_LIST("Selected, any list"),
-    BEST_ANY_LIST("Best, any list");
+    SELECTED_OR_BEST("Selected, Else Best"),
+    BEST("Best Tier"),
+    SELECTED("Selected Only"),
+    RANK("Overall Rank"),
+    SELECTED_ANY_LIST("Selected, Any List"),
+    BEST_ANY_LIST("Best, Any List");
 
     private final String label;
 

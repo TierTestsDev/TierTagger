@@ -9,6 +9,7 @@ import com.tiertests.tiertagger.gui.LookupHud;
 import com.tiertests.tiertagger.gui.Skins;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.Identifier;
@@ -28,6 +29,7 @@ public final class TierTaggerClient {
     private static KeyMapping configKey;
     private static KeyMapping lookupKey;
     private static KeyMapping lastHitKey;
+    private static Screen pendingScreen;
     private static UUID lastHit;
 
     private TierTaggerClient() {
@@ -60,10 +62,19 @@ public final class TierTaggerClient {
         TierTagger.start(platform);
     }
 
+    /** Opens a screen once the chat screen that ran a command has closed. */
+    public static void openNextTick(Screen screen) {
+        pendingScreen = screen;
+    }
+
     public static void tick(Minecraft minecraft) {
         TierTagger tagger = TierTagger.get();
         if (tagger == null) return;
         tagger.tick();
+        if (pendingScreen != null) {
+            BaseScreen.show(pendingScreen);
+            pendingScreen = null;
+        }
 
         while (configKey.consumeClick()) {
             BaseScreen.show(new ConfigScreen(null));

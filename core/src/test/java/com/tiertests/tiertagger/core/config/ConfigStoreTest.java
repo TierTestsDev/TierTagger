@@ -37,11 +37,11 @@ class ConfigStoreTest {
         TaggerConfig config = new ConfigStore(dir, "tiertests").load();
 
         assertEquals("pvptiers", config.primary.list);
-        assertEquals("#4", config.primary.mode);
+        assertEquals(TaggerConfig.Slot.BEST, config.primary.mode);
         assertTrue(config.secondary.enabled);
         assertEquals("subtiers", config.secondary.list);
         assertEquals("Bed", config.secondary.mode);
-        assertEquals(DisplayMode.BEST_ANY_LIST, config.displayMode);
+        assertEquals(DisplayMode.SELECTED_OR_BEST, config.displayMode);
         assertEquals(Layout.SPLIT, config.layout);
         assertEquals(IconStyle.CLASSIC, config.icons);
         assertEquals(TierFormat.LETTER, config.tierFormat);

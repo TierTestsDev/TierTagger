@@ -13,21 +13,21 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import java.util.Arrays;
 import java.util.List;
 
-/** {@code /tiertag} opens the settings, {@code /tiertag <name>} searches a player. */
+/** {@code /tiertagger} opens the settings, {@code /tiertagger <name>} searches a player. */
 final class TierTagCommand extends CommandBase {
     @Override
     public String getCommandName() {
-        return "tiertag";
+        return "tiertagger";
     }
 
     @Override
     public List<String> getCommandAliases() {
-        return Arrays.asList("tiertagger");
+        return Arrays.asList("tiertag");
     }
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/tiertag [player]";
+        return "/tiertagger [player]";
     }
 
     @Override

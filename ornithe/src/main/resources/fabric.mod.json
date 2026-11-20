@@ -23,5 +23,8 @@
     "osl-entrypoints": ">=0.6.0",
     "osl-keybinds": ">=0.3.0",
     "osl-lifecycle-events": ">=0.6.0"
+  },
+  "suggests": {
+    "oneconfig": ">=1.8.0"
   }
 }

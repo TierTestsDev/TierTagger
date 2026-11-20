@@ -18,8 +18,9 @@ import java.util.function.BiConsumer;
 
 /** Looks a username up on every tier list at once. */
 public final class SearchScreen extends Screen {
-    private static final int CONTENT_TOP = 34;
-    private static final int LINE = 11;
+    private static final int TOP = 48;
+    private static final int ROW = 12;
+    private static final int GRAY = 0xFFA0A0A0;
 
     private final Screen parent;
     private final String initialQuery;
@@ -40,16 +41,15 @@ public final class SearchScreen extends Screen {
     @Override
     public void init() {
         Keyboard.enableRepeatEvents(true);
-        int barW = Math.min(280, width - 40);
-        int left = width / 2 - barW / 2;
+        int left = width / 2 - 132;
         String previous = field != null ? field.getText() : initialQuery != null ? initialQuery : "";
-        field = new TextFieldWidget(0, textRenderer, left + 4, 8, barW - 60, 20);
+        field = new TextFieldWidget(0, textRenderer, left + 1, 23, 198, 18);
         field.setMaxLength(16);
         field.setText(previous);
         field.setFocused(true);
         buttons.clear();
-        buttons.add(new ButtonWidget(1, left + barW - 52, 8, 52, 20, "Search"));
-        buttons.add(new ButtonWidget(2, 4, 8, 50, 20, "← Back"));
+        buttons.add(new ButtonWidget(1, left + 204, 22, 60, 20, "Search"));
+        buttons.add(new ButtonWidget(2, width / 2 - 100, height - 28, 200, 20, "Done"));
         if (initialQuery != null && result == null && !searching && status.isEmpty()) search();
     }
 
@@ -127,54 +127,65 @@ public final class SearchScreen extends Screen {
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         renderBackground();
+        Draw.rect(0, TOP, width, height - 34 - TOP, 0x60000000);
+        Draw.rect(0, TOP - 1, width, 1, 0x40FFFFFF);
+        Draw.rect(0, height - 34, width, 1, 0x40FFFFFF);
+        Draw.centered("Player Search", width / 2, 8, Draw.TEXT);
         field.render();
         super.render(mouseX, mouseY, partialTicks);
 
         int centerX = width / 2;
         if (searching) {
-            Draw.centered("§7Searching every tier list...", centerX, CONTENT_TOP + 20, Draw.TEXT_DIM);
+            Draw.centered("§7Searching...", centerX, TOP + 16, GRAY);
             return;
         }
         if (!status.isEmpty()) {
-            Draw.centered(status, centerX, CONTENT_TOP + 20, Draw.TEXT);
+            Draw.centered(status, centerX, TOP + 16, GRAY);
             return;
         }
         if (result == null) {
-            Draw.centered("§7Search for a player above", centerX, CONTENT_TOP + 30, Draw.TEXT_DIM);
+            Draw.centered("§7Search for a player on every tier list", centerX, TOP + 16, GRAY);
             return;
         }
 
-        int contentW = Math.min(340, width - 20);
+        int contentW = Math.min(260, width - 40);
         int left = centerX - contentW / 2;
-        int y = CONTENT_TOP - scroll;
-
-        Draw.rect(left, y, contentW, 44, Draw.PANEL);
-        Draw.border(left, y, contentW, 44, Draw.ACCENT);
-        Draw.face(result.uuid(), result.name(), left + 6, y + 6, 32);
-        Draw.text("§a§l" + result.name(), left + 46, y + 10, Draw.TEXT, true);
-        int count = result.profiles().size();
-        Draw.text("§7Ranked on §f" + count + "§7 tier list" + (count == 1 ? "" : "s"), left + 46, y + 24, Draw.TEXT_DIM, false);
-        y += 56;
+        int bottom = height - 34;
+        int y = TOP + 8 - scroll;
+        if (y + 32 > TOP && y < bottom) {
+            Draw.face(result.uuid(), result.name(), left, y, 32);
+            Draw.text(result.name(), left + 38, y + 4, Draw.TEXT, true);
+            int count = result.profiles().size();
+            Draw.text("Ranked on " + count + " tier list" + (count == 1 ? "" : "s"), left + 38, y + 18, GRAY, false);
+        }
+        y += 44;
 
         for (Map.Entry<TierList, PlayerProfile> entry : result.profiles().entrySet()) {
             PlayerProfile profile = entry.getValue();
-            int cardH = 24 + profile.rankings().size() * LINE + 6;
-            if (y + cardH > CONTENT_TOP - 20 && y < height) {
-                Draw.rect(left, y, contentW, cardH, Draw.PANEL);
-                Draw.border(left, y, contentW, cardH, Draw.ACCENT_DIM);
-                String meta = (profile.region() != null ? "§9" + profile.region().code() + "  " : "")
-                        + (profile.rank() > 0 ? "§6#" + profile.rank() : "");
-                Draw.text("§f§l" + entry.getKey().displayName(), left + 8, y + 7, Draw.TEXT, true);
-                Draw.text(meta, left + contentW - Draw.width(meta) - 8, y + 7, Draw.TEXT, true);
-                int lineY = y + 22;
-                for (Map.Entry<GameMode, Ranking> ranking : profile.rankings().entrySet()) {
-                    Draw.text(LookupHud.line(tagger, ranking.getKey(), ranking.getValue()), left + 10, lineY, Draw.TEXT, false);
-                    lineY += LINE;
-                }
+            if (visible(y, bottom)) Draw.centered("§l" + entry.getKey().displayName(), centerX, y, Draw.TEXT);
+            y += ROW;
+            String meta = (profile.region() != null ? profile.region().code() : "")
+                    + (profile.rank() > 0 ? (profile.region() != null ? "  ·  " : "") + "#" + profile.rank() : "");
+            if (!meta.isEmpty()) {
+                if (visible(y, bottom)) Draw.centered("§7" + meta, centerX, y, GRAY);
+                y += ROW;
             }
-            y += cardH + 8;
+            y += 3;
+            for (Map.Entry<GameMode, Ranking> ranking : profile.rankings().entrySet()) {
+                if (visible(y, bottom)) {
+                    Draw.text(LookupHud.name(tagger, ranking.getKey()), left, y, Draw.TEXT, true);
+                    String tier = LookupHud.tier(tagger, ranking.getValue());
+                    Draw.text(tier, left + contentW - Draw.width(tier), y, Draw.TEXT, true);
+                }
+                y += ROW;
+            }
+            y += 10;
         }
-        maxScroll = Math.max(0, y + scroll - height + 10);
+        maxScroll = Math.max(0, y + scroll - bottom);
+    }
+
+    private static boolean visible(int y, int bottom) {
+        return y >= TOP && y + 9 <= bottom;
     }
 
     @Override

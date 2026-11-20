@@ -13,7 +13,11 @@ A rewrite of the whole mod. Your settings carry over automatically.
 - Gamemode icons on 1.8.9, in nametags, the tab list, the lookup popup and player search.
 - Real icons for the Tier Tests legacy gamemodes (Bedfight, Bedwars, Boxing, Bridge, Build UHC, Emerald Rush, Fireball Fight, No Debuff and Sumo) on every version.
 - Forge 1.8.9 now has the same features as Fabric: two tags, every display mode, the lookup popup, player search and all tier lists. It uses Forge's own events, so it works with other 1.8.9 mods and clients.
-- Settings button in **Mod Menu** (Fabric) and Forge's mod list, and a `/tiertag` command on Forge 1.8.9.
+- Simpler settings in the style of Minecraft's own option screens, with tooltips. The gamemode button now also offers your best tier or overall rank, and the second tag is a single button.
+- Player search now looks like Minecraft's own list screens.
+- `/tiertagger` opens the settings and `/tiertagger <name>` searches a player, on every version.
+- Settings in **Mod Menu** (Fabric), Forge's mod list and the **OneConfig** menu (OneClient).
+- New default keys that do not clash with OneClient's mods: **I** opens the settings, **U** looks up the nearest player and **Z** the last player you hit.
 - **Retired** tiers are marked with an R, and peak tiers are shown for every list that reports them.
 - Option to hide the Tier Tests badge.
 
@@ -31,6 +35,7 @@ A rewrite of the whole mod. Your settings carry over automatically.
 - "Best tier" mode could show the selected gamemode instead of the best one.
 - Gamemodes without an icon showed broken symbols on 1.8.9.
 - Dark gamemode colors, like No Debuff's, were hard to read in the popup and player search.
+- The nametag in the settings preview floated away from the player.
 
 ### Faster
 

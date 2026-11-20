@@ -5,6 +5,7 @@
   "client": [
     "ClientPlayerInteractionManagerMixin",
     "GameGuiMixin",
+    "LocalClientPlayerEntityMixin",
     "LivingEntityRendererMixin",
     "PlayerTabOverlayMixin",
     "TextRendererMixin"

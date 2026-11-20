@@ -1,20 +1,30 @@
 package com.tiertests.tiertagger.fabric;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.tiertests.tiertagger.TierTaggerClient;
 import com.tiertests.tiertagger.core.Platform;
+import com.tiertests.tiertagger.gui.ConfigScreen;
 import com.tiertests.tiertagger.gui.Gfx;
 import com.tiertests.tiertagger.gui.LookupHud;
+import com.tiertests.tiertagger.gui.SearchScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 //? if >=26.1 {
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 //?} else
-/*import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;*/
+/*import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;*/
 //? if >=1.21.6 {
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 //?} else
@@ -32,18 +42,43 @@ public final class TierTaggerFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        KeyMapping config = register("key.tiertag.openconfig", InputConstants.KEY_N);
+        KeyMapping config = register("key.tiertag.openconfig", InputConstants.KEY_I);
         KeyMapping lookup = register("key.tiertag.lookup", InputConstants.KEY_U);
-        KeyMapping lastHit = register("key.tiertag.lookup_last_hit", InputConstants.KEY_C);
+        KeyMapping lastHit = register("key.tiertag.lookup_last_hit", InputConstants.KEY_Z);
         TierTaggerClient.init(new FabricPlatform(), config, lookup, lastHit);
 
         ClientTickEvents.END_CLIENT_TICK.register(TierTaggerClient::tick);
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, context) -> dispatcher.register(
+                literal("tiertagger")
+                        .executes(command -> {
+                            TierTaggerClient.openNextTick(new ConfigScreen(null));
+                            return 1;
+                        })
+                        .then(argument("player", StringArgumentType.word()).executes(command -> {
+                            String player = StringArgumentType.getString(command, "player");
+                            TierTaggerClient.openNextTick(new SearchScreen(null, player));
+                            return 1;
+                        }))));
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> TierTaggerClient.onDisconnect());
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> TierTaggerClient.shutdown());
         //? if >=1.21.6 {
         HudElementRegistry.addLast(TierTaggerClient.id("lookup"), (graphics, tracker) -> LookupHud.render(new Gfx(graphics)));
         //?} else
         /*HudRenderCallback.EVENT.register((graphics, tracker) -> LookupHud.render(new Gfx(graphics)));*/
+    }
+
+    private static LiteralArgumentBuilder<FabricClientCommandSource> literal(String name) {
+        //? if >=26.1 {
+        return ClientCommands.literal(name);
+        //?} else
+        /*return ClientCommandManager.literal(name);*/
+    }
+
+    private static <T> RequiredArgumentBuilder<FabricClientCommandSource, T> argument(String name, ArgumentType<T> type) {
+        //? if >=26.1 {
+        return ClientCommands.argument(name, type);
+        //?} else
+        /*return ClientCommandManager.argument(name, type);*/
     }
 
     private static KeyMapping register(String name, int key) {

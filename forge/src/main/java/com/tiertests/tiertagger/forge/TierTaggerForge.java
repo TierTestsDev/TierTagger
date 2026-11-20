@@ -62,9 +62,9 @@ public final class TierTaggerForge {
                 "glyphWidth", "field_78287_e");
         ModeKind.markGlyphWidths(glyphSizes);
 
-        configKey = key("key.tiertag.openconfig", Keyboard.KEY_N);
+        configKey = key("key.tiertag.openconfig", Keyboard.KEY_I);
         lookupKey = key("key.tiertag.lookup", Keyboard.KEY_U);
-        lastHitKey = key("key.tiertag.lookup_last_hit", Keyboard.KEY_C);
+        lastHitKey = key("key.tiertag.lookup_last_hit", Keyboard.KEY_Z);
 
         MinecraftForge.EVENT_BUS.register(new ForgeEvents());
         ClientCommandHandler.instance.registerCommand(new TierTagCommand());

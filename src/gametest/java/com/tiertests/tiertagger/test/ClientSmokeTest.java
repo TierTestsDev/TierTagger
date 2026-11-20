@@ -48,7 +48,7 @@ public final class ClientSmokeTest implements FabricClientGameTest {
             context.takeScreenshot("tiertag-search");
 
             context.setScreen(() -> null);
-            context.runOnClient(minecraft -> TierTagger.get().settings().toggleSecondary());
+            context.runOnClient(minecraft -> TierTagger.get().settings().cycleSecondaryList());
             context.waitFor(minecraft -> SAMPLES.stream().allMatch(ClientSmokeTest::resolved), TIMEOUT);
             context.setScreen(TagPreviewScreen::new);
             context.waitTicks(10);

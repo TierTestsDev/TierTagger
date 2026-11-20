@@ -1,34 +1,29 @@
 package com.tiertests.tiertagger.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.tiertests.tiertagger.core.LookupResult;
 import com.tiertests.tiertagger.core.TierTagger;
-import com.tiertests.tiertagger.core.model.Colors;
 import com.tiertests.tiertagger.core.model.GameMode;
 import com.tiertests.tiertagger.core.model.PlayerProfile;
 import com.tiertests.tiertagger.core.model.Ranking;
 import com.tiertests.tiertagger.core.model.Strings;
-import com.tiertests.tiertagger.core.model.Tier;
 import com.tiertests.tiertagger.core.source.TierList;
 import com.tiertests.tiertagger.core.text.Text;
 import com.tiertests.tiertagger.render.Components;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import com.mojang.blaze3d.platform.InputConstants;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-/** Looks a username up on every tier list at once. */
+/** Looks a username up on every tier list at once, laid out like the vanilla list screens. */
 public final class SearchScreen extends BaseScreen {
-    private static final int CONTENT_TOP = 34;
-    private static final int PADDING = 8;
-    private static final int PILL_H = 22;
-    private static final int PILL_GAP = 4;
-    private static final int SECTION_GAP = 12;
-    private static final int CARD_HEADER = 28;
+    private static final int HEADER = 48;
+    private static final int FOOTER = 33;
+    private static final int ROW = 12;
+    private static final int GRAY = 0xFFA0A0A0;
 
     private final TierTagger tagger = TierTagger.get();
     private EditBox field;
@@ -40,30 +35,38 @@ public final class SearchScreen extends BaseScreen {
     private int scroll;
     private int maxScroll;
     private int ticks;
+    private boolean searchOnOpen;
 
     public SearchScreen(Screen parent) {
-        super(Component.literal("Player search"), parent);
+        this(parent, null);
+    }
+
+    /** Opens with {@code player} already searched. */
+    public SearchScreen(Screen parent, String player) {
+        super(Component.literal("Player Search"), parent);
+        if (player != null) query = player;
+        searchOnOpen = player != null;
     }
 
     @Override
     protected void init() {
-        int barW = Math.min(280, width - 40);
-        int fieldW = barW - 76;
-        int left = width / 2 - barW / 2;
-
-        field = new EditBox(font, left + 4, 8, fieldW, 20, Component.literal("Username"));
+        int fieldW = 200;
+        int buttonW = 60;
+        int left = width / 2 - (fieldW + 4 + buttonW) / 2;
+        field = new EditBox(font, left, 22, fieldW, 20, Component.literal("Username"));
         field.setMaxLength(16);
         field.setValue(query);
-        field.setHint(Component.literal("Enter a username").withColor(0x777777));
+        field.setHint(Component.literal("Username").withColor(0x808080));
         addRenderableWidget(field);
         setInitialFocus(field);
-
         addRenderableWidget(Button.builder(Component.literal("Search"), b -> search())
-                .bounds(left + fieldW + 8, 8, 48, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("✕"), b -> clear())
-                .bounds(left + fieldW + 60, 8, 16, 20).build());
-        addRenderableWidget(Button.builder(Component.literal("← Back"), b -> onClose())
-                .bounds(4, 8, 50, 20).build());
+                .bounds(left + fieldW + 4, 22, buttonW, 20).build());
+        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, b -> onClose())
+                .bounds(width / 2 - 100, height - FOOTER + 7, 200, 20).build());
+        if (searchOnOpen) {
+            searchOnOpen = false;
+            search();
+        }
     }
 
     @Override
@@ -75,21 +78,12 @@ public final class SearchScreen extends BaseScreen {
         return false;
     }
 
-    private void clear() {
-        field.setValue("");
-        query = "";
-        status = "";
-        result = null;
-        searching = false;
-        scroll = 0;
-        requestId++;
-    }
-
     private void search() {
         String name = field.getValue().trim();
         if (name.isEmpty()) return;
         if (!Strings.isValidUsername(name)) {
-            status = "§cThat is not a valid username.";
+            status = "That is not a valid username.";
+            result = null;
             return;
         }
         query = name;
@@ -101,9 +95,9 @@ public final class SearchScreen extends BaseScreen {
         tagger.search(name).whenComplete((found, error) -> minecraft.execute(() -> {
             if (request != requestId) return;
             searching = false;
-            if (error != null) status = "§cCould not reach the tier lists. Try again later.";
-            else if (found == null) status = "§cNo Minecraft account is called " + name + ".";
-            else if (found.isEmpty()) status = "§7" + found.name() + " is not ranked on any tier list.";
+            if (error != null) status = "Could not reach the tier lists. Try again later.";
+            else if (found == null) status = "No Minecraft account is called " + name + ".";
+            else if (found.isEmpty()) status = found.name() + " is not ranked on any tier list.";
             else result = found;
             if (found != null) Skins.skin(found.uuid());
         }));
@@ -116,141 +110,108 @@ public final class SearchScreen extends BaseScreen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontal, double vertical) {
-        scroll = Math.max(0, Math.min(maxScroll, scroll - (int) (vertical * 20)));
+        scroll = Math.max(0, Math.min(maxScroll, scroll - (int) (vertical * 18)));
         return true;
+    }
+
+    @Override
+    protected void drawBackground(Gfx gfx) {
+        listArea(gfx, HEADER, height - FOOTER);
     }
 
     @Override
     protected void draw(Gfx gfx, int mouseX, int mouseY, float delta) {
         int centerX = width / 2;
-        int contentW = Math.min(340, width - 20);
-        int left = centerX - contentW / 2;
+        int top = HEADER;
+        int bottom = height - FOOTER;
+        gfx.centered(title, centerX, 8, Theme.TEXT);
 
         if (searching) {
-            gfx.centered("§7Searching every tier list" + ".".repeat(ticks / 5 % 4), centerX, CONTENT_TOP + 20, Theme.TEXT_DIM);
-            float pulse = (float) (Math.sin(ticks * 0.3) * 0.5 + 0.5);
-            gfx.rect(centerX - 40, CONTENT_TOP + 36, 80, 3, (int) (100 + 155 * pulse) << 24 | Theme.ACCENT & 0xFFFFFF);
+            gfx.centered(Component.literal("Searching" + ".".repeat(ticks / 6 % 4)), centerX, top + 16, GRAY);
             return;
         }
         if (!status.isEmpty()) {
-            gfx.centered(status, centerX, CONTENT_TOP + 20, Theme.TEXT);
+            gfx.centered(Component.literal(status), centerX, top + 16, result == null && !query.isEmpty() ? 0xFFFF5555 : GRAY);
             return;
         }
         if (result == null) {
-            gfx.centered("§7Search for a player above", centerX, CONTENT_TOP + 30, Theme.TEXT_DIM);
+            gfx.centered(Component.literal("Search for a player on every tier list"), centerX, top + 16, GRAY);
             return;
         }
 
-        gfx.scissor(0, CONTENT_TOP, width, height);
-        int y = CONTENT_TOP - scroll;
-        y = drawHeader(gfx, left, y, contentW) + SECTION_GAP;
+        int contentW = Math.min(260, width - 40);
+        int left = centerX - contentW / 2;
+        gfx.scissor(0, top, width, bottom);
+        int y = top + 8 - scroll;
+        y = drawPlayer(gfx, left, y, contentW) + 12;
         for (Map.Entry<TierList, PlayerProfile> entry : result.profiles().entrySet()) {
-            y = drawCard(gfx, left, y, contentW, entry.getKey(), entry.getValue()) + SECTION_GAP;
+            y = drawList(gfx, left, y, contentW, entry.getKey(), entry.getValue()) + 10;
         }
         gfx.endScissor();
 
-        maxScroll = Math.max(0, y + scroll - CONTENT_TOP - (height - CONTENT_TOP) + 10);
+        maxScroll = Math.max(0, y + scroll - bottom);
         if (maxScroll > 0) {
-            int track = height - CONTENT_TOP;
-            int bar = Math.max(10, track * track / (track + maxScroll));
-            int barY = CONTENT_TOP + (int) ((float) scroll / maxScroll * (track - bar));
-            gfx.rect(width - 4, CONTENT_TOP, 2, track, 0x20FFFFFF);
-            gfx.rect(width - 4, barY, 2, bar, 0x80FFFFFF);
+            int x = left + contentW + 8;
+            int track = bottom - top;
+            int bar = Math.max(24, track * track / (track + maxScroll));
+            int barY = top + (int) ((float) scroll / maxScroll * (track - bar));
+            gfx.rect(x, top, 6, track, 0xFF000000);
+            gfx.rect(x, barY, 6, bar, 0xFF808080);
+            gfx.rect(x, barY, 5, bar - 1, 0xFFC0C0C0);
         }
     }
 
-    private int drawHeader(Gfx gfx, int x, int y, int w) {
-        int h = 52;
-        gfx.roundRect(x, y, w, h, Theme.PANEL);
-        gfx.border(x, y, w, h, Theme.ACCENT);
-        Skins.face(gfx, result.uuid(), x + 6, y + 6, h - 12);
-
-        gfx.text(Component.literal("§l" + result.name()).withColor(0x55FF55), x + 60, y + 10, Theme.TEXT, true);
+    private int drawPlayer(Gfx gfx, int x, int y, int w) {
+        Skins.face(gfx, result.uuid(), x, y, 32);
+        gfx.text(result.name(), x + 38, y + 4, Theme.TEXT, true);
         int count = result.profiles().size();
-        gfx.text("§7Ranked on §f" + count + "§7 tier list" + (count == 1 ? "" : "s"), x + 60, y + 24, Theme.TEXT_DIM, false);
-
-        Tier best = null;
-        for (PlayerProfile profile : result.profiles().values()) {
-            Tier tier = profile.best().getValue().tier();
-            if (tier.isBetterThan(best)) best = tier;
-        }
-        if (best != null) {
-            Component label = Component.literal("Best: ").withColor(0xAAAAAA)
-                    .append(Component.literal(best.format(tagger.config().tierFormat)).withColor(best.color()));
-            gfx.text(label, x + w - gfx.width(label) - PADDING, y + 14, Theme.TEXT, true);
-        }
-        return y + h;
+        gfx.text("Ranked on " + count + " tier list" + (count == 1 ? "" : "s"), x + 38, y + 18, GRAY, false);
+        return y + 32;
     }
 
-    private int drawCard(Gfx gfx, int x, int y, int w, TierList list, PlayerProfile profile) {
-        int pillW = pillWidth(w);
-        int columns = Math.max(1, (w - PADDING * 2 + PILL_GAP) / (pillW + PILL_GAP));
-        int count = profile.rankings().size();
-        int rows = (count + columns - 1) / columns;
-        int h = CARD_HEADER + 16 + PADDING + rows * (PILL_H + PILL_GAP) + PADDING;
-
-        gfx.roundRect(x, y, w, h, Theme.PANEL);
-        gfx.border(x, y, w, h, Theme.ACCENT_DIM);
-        gfx.fill(x + 1, y + 1, x + w - 1, y + CARD_HEADER, Theme.HEADER);
-        gfx.fill(x + 1, y + CARD_HEADER - 1, x + w - 1, y + CARD_HEADER, Theme.ACCENT_DIM);
-
-        int titleX = x + PADDING + 2;
-        int titleY = y + (CARD_HEADER - 8) / 2;
+    private int drawList(Gfx gfx, int x, int y, int w, TierList list, PlayerProfile profile) {
+        int centerX = x + w / 2;
+        Component title = Component.literal(list.displayName()).withStyle(s -> s.withBold(true));
         if (list.logo() != 0) {
             Component logo = Components.icon(list.logo());
-            gfx.text(logo, titleX, titleY - 2, Theme.TEXT, false);
-            titleX += gfx.width(logo) + 3;
+            int total = gfx.width(logo) + 3 + gfx.width(title);
+            gfx.text(logo, centerX - total / 2, y - 2, Theme.TEXT, false);
+            gfx.text(title, centerX - total / 2 + gfx.width(logo) + 3, y, Theme.TEXT, true);
+        } else {
+            gfx.centered(title, centerX, y, Theme.TEXT);
         }
-        gfx.text(Component.literal("§l" + list.displayName()), titleX, titleY, Theme.TEXT, true);
+        y += 12;
 
-        int metaX = x + PADDING + 2;
-        int metaY = y + CARD_HEADER + 3;
-        if (profile.region() != null) metaX += pill(gfx, metaX, metaY, "⚑ " + profile.region().code(), Theme.REGION) + 4;
-        if (profile.rank() > 0) {
-            String points = profile.points() > 0 ? " §8(" + formatPoints(profile.points()) + " pts)" : "";
-            pill(gfx, metaX, metaY, "✦ #" + profile.rank() + points, Theme.GOLD);
+        StringBuilder meta = new StringBuilder();
+        if (profile.region() != null) meta.append(profile.region().code());
+        if (profile.rank() > 0) meta.append(meta.length() > 0 ? "  ·  " : "").append('#').append(profile.rank());
+        if (profile.points() > 0) meta.append(meta.length() > 0 ? "  ·  " : "").append(formatPoints(profile.points())).append(" points");
+        if (meta.length() > 0) {
+            gfx.centered(Component.literal(meta.toString()), centerX, y, GRAY);
+            y += 12;
         }
+        y += 3;
 
-        int top = metaY + 16 + 2;
-        List<Map.Entry<GameMode, Ranking>> rankings = new ArrayList<>(profile.rankings().entrySet());
-        for (int i = 0; i < rankings.size(); i++) {
-            int pillX = x + PADDING + i % columns * (pillW + PILL_GAP);
-            int pillY = top + i / columns * (PILL_H + PILL_GAP);
-            drawTier(gfx, pillX, pillY, pillW, rankings.get(i).getKey(), rankings.get(i).getValue());
+        for (Map.Entry<GameMode, Ranking> entry : profile.rankings().entrySet()) {
+            drawRow(gfx, x, y, w, entry.getKey(), entry.getValue());
+            y += ROW;
         }
-        return y + h;
+        return y;
     }
 
-    private int pill(Gfx gfx, int x, int y, String text, int color) {
-        int w = gfx.width(text) + 10;
-        gfx.roundRect(x, y, w, 12, Theme.PILL);
-        gfx.text(text, x + 5, y + 2, color, false);
-        return w;
-    }
-
-    private void drawTier(Gfx gfx, int x, int y, int w, GameMode mode, Ranking ranking) {
-        int color = Theme.opaque(Colors.readable(mode.color()));
-        gfx.roundRect(x, y, w, PILL_H, Theme.blend(Theme.PANEL_LIGHT, color, 0.15f));
-        gfx.fill(x, y + 2, x + 2, y + PILL_H - 2, color);
-
+    private void drawRow(Gfx gfx, int x, int y, int w, GameMode mode, Ranking ranking) {
         Text.Builder label = Text.builder();
         tagger.tagBuilder().appendIcon(label, mode, tagger.config().icons);
-        label.append(mode.title(), Colors.readable(mode.color()));
-        int textY = y + (PILL_H - 8) / 2;
-        gfx.text(Components.of(label.build()), x + 6, textY, Theme.TEXT, false);
+        label.append(mode.title(), 0xFFFFFF);
+        gfx.text(Components.of(label.build()), x, y, Theme.TEXT, true);
 
         Text.Builder tier = Text.builder();
         if (ranking.hasHigherPeak()) {
-            tier.append("↑" + ranking.peak().format(tagger.config().tierFormat) + " ", 0x777777);
+            tier.append("peak ", 0x808080).append(ranking.peak().format(tagger.config().tierFormat), 0x808080).append("  ", -1);
         }
         tagger.tagBuilder().appendTier(tier, ranking, tagger.config().tierFormat);
         Component tierText = Components.of(tier.build());
-        gfx.text(tierText, x + w - gfx.width(tierText) - 6, textY, Theme.TEXT, true);
-    }
-
-    private static int pillWidth(int cardW) {
-        int available = cardW - PADDING * 2;
-        return available >= 2 * 120 + PILL_GAP ? (available - PILL_GAP) / 2 : available;
+        gfx.text(tierText, x + w - gfx.width(tierText), y, Theme.TEXT, true);
     }
 
     private static String formatPoints(double points) {

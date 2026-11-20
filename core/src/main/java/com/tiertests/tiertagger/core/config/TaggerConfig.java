@@ -14,8 +14,14 @@ public final class TaggerConfig {
     public boolean showBadge = true;
     public boolean showInTab = true;
 
-    /** Which tier list and gamemode a tag shows. {@code mode} is the list's gamemode id. */
+    /**
+     * Which tier list and gamemode a tag shows. {@code mode} is the list's gamemode id, or {@link #BEST}
+     * or {@link #RANK}. A gamemode the player is not ranked in falls back to their best tier.
+     */
     public static final class Slot {
+        public static final String BEST = "*best";
+        public static final String RANK = "*rank";
+
         public boolean enabled;
         public String list;
         public String mode;
@@ -37,6 +43,9 @@ public final class TaggerConfig {
         if (primary.list == null) primary.list = defaultList;
         if (secondary.list == null) secondary.list = "mctiers";
         if (displayMode == null) displayMode = DisplayMode.SELECTED_OR_BEST;
+        if (displayMode == DisplayMode.BEST || displayMode == DisplayMode.BEST_ANY_LIST) primary.mode = Slot.BEST;
+        else if (displayMode == DisplayMode.RANK) primary.mode = Slot.RANK;
+        if (displayMode != DisplayMode.SELECTED_ANY_LIST) displayMode = DisplayMode.SELECTED_OR_BEST;
         if (layout == null) layout = Layout.PREFIX;
         if (icons == null) icons = IconStyle.PIXEL;
         if (tierFormat == null) tierFormat = TierFormat.CODE;

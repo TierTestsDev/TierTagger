@@ -157,7 +157,7 @@ public final class TierTagger {
         return revision.get();
     }
 
-    void configChanged() {
+    public void configChanged() {
         revision.incrementAndGet();
         final TaggerConfig snapshot = config;
         executor.execute(() -> configStore.save(snapshot));
@@ -287,14 +287,13 @@ public final class TierTagger {
 
     private Tag buildTag(TaggerConfig cfg, PlayerProfile primaryProfile, PlayerProfile secondaryProfile,
                          List<PlayerProfile> others, Badge badge, boolean compact) {
-        DisplayMode mode = cfg.displayMode;
-        TagBuilder.Pick primaryPick = tagBuilder.pick(primaryProfile, selectedMode(cfg.primary), mode, others);
+        TagBuilder.Pick primaryPick = tagBuilder.pick(primaryProfile, selectedMode(cfg.primary),
+                displayMode(cfg.primary, cfg.displayMode), others);
         Text primaryText = tagBuilder.slot(primaryPick, cfg);
 
         Text secondaryText = Text.EMPTY;
         if (cfg.secondary.enabled) {
-            DisplayMode secondaryMode = mode == DisplayMode.SELECTED || mode == DisplayMode.BEST
-                    ? mode : DisplayMode.SELECTED_OR_BEST;
+            DisplayMode secondaryMode = displayMode(cfg.secondary, DisplayMode.SELECTED_OR_BEST);
             secondaryText = tagBuilder.slot(
                     tagBuilder.pick(secondaryProfile, selectedMode(cfg.secondary), secondaryMode, null), cfg);
         }
@@ -311,6 +310,12 @@ public final class TierTagger {
             }
         }
         return tagBuilder.compose(primaryText, secondaryText, cfg);
+    }
+
+    private static DisplayMode displayMode(TaggerConfig.Slot slot, DisplayMode gamemodeMode) {
+        if (TaggerConfig.Slot.BEST.equals(slot.mode)) return DisplayMode.BEST;
+        if (TaggerConfig.Slot.RANK.equals(slot.mode)) return DisplayMode.RANK;
+        return gamemodeMode;
     }
 
     private static boolean isTierTests(TierList list) {

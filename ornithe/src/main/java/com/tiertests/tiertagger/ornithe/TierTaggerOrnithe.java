@@ -5,6 +5,8 @@ import com.tiertests.tiertagger.core.Platform;
 import com.tiertests.tiertagger.core.TierTagger;
 import com.tiertests.tiertagger.ornithe.gui.ConfigScreen;
 import com.tiertests.tiertagger.ornithe.gui.LookupHud;
+import com.tiertests.tiertagger.ornithe.gui.SearchScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.options.KeyBinding;
@@ -31,6 +33,8 @@ public final class TierTaggerOrnithe implements ClientModInitializer {
     private static KeyBinding lookupKey;
     private static KeyBinding lastHitKey;
     private static UUID lastHit;
+    private static Screen pendingScreen;
+    private static Runnable oneConfigSync;
 
     @Override
     public void initClient() {
@@ -53,12 +57,37 @@ public final class TierTaggerOrnithe implements ClientModInitializer {
         TierTagger.start(new OrnithePlatform());
 
         KeybindEvents.REGISTER_KEYBINDS.register(() -> {
-            configKey = KeybindRegistry.register("key.tiertag.openconfig", Keyboard.KEY_N, CATEGORY);
+            configKey = KeybindRegistry.register("key.tiertag.openconfig", Keyboard.KEY_I, CATEGORY);
             lookupKey = KeybindRegistry.register("key.tiertag.lookup", Keyboard.KEY_U, CATEGORY);
-            lastHitKey = KeybindRegistry.register("key.tiertag.lookup_last_hit", Keyboard.KEY_C, CATEGORY);
+            lastHitKey = KeybindRegistry.register("key.tiertag.lookup_last_hit", Keyboard.KEY_Z, CATEGORY);
         });
         MinecraftClientEvents.TICK_END.register(TierTaggerOrnithe::tick);
+        if (FabricLoader.getInstance().isModLoaded("oneconfig")) oneConfigSync = addToOneConfig();
         MinecraftClientEvents.STOP.register(minecraft -> TierTagger.get().shutdown());
+    }
+
+    /** Loaded by name so the game never touches OneConfig classes when OneConfig is not installed. */
+    private static Runnable addToOneConfig() {
+        try {
+            return (Runnable) Class.forName("com.tiertests.tiertagger.ornithe.oneconfig.TierTaggerOneConfig")
+                    .getMethod("register").invoke(null);
+        } catch (ReflectiveOperationException | LinkageError e) {
+            LOGGER.warn("Could not add Tier Tagger to OneConfig", e);
+            return null;
+        }
+    }
+
+    /** Opens a screen on the next tick, after the chat screen or OneConfig menu that asked for it has closed. */
+    public static void openNextTick(Screen screen) {
+        pendingScreen = screen;
+    }
+
+    /** Handles {@code /tiertagger} and {@code /tiertagger <name>}; returns false for any other message. */
+    public static boolean onChatCommand(String message) {
+        String[] parts = message.trim().split(" +");
+        if (parts.length == 0 || !parts[0].equalsIgnoreCase("/tiertagger") || parts.length > 2) return false;
+        openNextTick(parts.length == 1 ? new ConfigScreen(null) : new SearchScreen(null, parts[1]));
+        return true;
     }
 
     public static void onAttack(PlayerEntity target) {
@@ -70,6 +99,11 @@ public final class TierTaggerOrnithe implements ClientModInitializer {
         if (tagger == null || configKey == null) return;
         tagger.tick();
         if (minecraft.world == null) lastHit = null;
+        if (pendingScreen != null) {
+            minecraft.openScreen(pendingScreen);
+            pendingScreen = null;
+        }
+        if (oneConfigSync != null) oneConfigSync.run();
 
         while (configKey.consumeClick()) {
             minecraft.openScreen(new ConfigScreen(null));

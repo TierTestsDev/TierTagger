@@ -132,6 +132,24 @@ public final class LookupHud {
         Draw.rect(MARGIN, MARGIN + height - 2, (int) (width * remaining), 2, Draw.ACCENT);
     }
 
+    /** Gamemode icon and name, for the search screen. */
+    static String name(TierTagger tagger, GameMode mode) {
+        Text.Builder text = Text.builder();
+        tagger.tagBuilder().appendIcon(text, mode, tagger.config().icons);
+        text.append(mode.title(), 0xFFFFFF);
+        return text.build().toLegacyString();
+    }
+
+    /** Tier with its peak, for the search screen. */
+    static String tier(TierTagger tagger, Ranking ranking) {
+        Text.Builder text = Text.builder();
+        if (ranking.hasHigherPeak()) {
+            text.append("peak " + ranking.peak().format(tagger.config().tierFormat) + "  ", 0x808080);
+        }
+        tagger.tagBuilder().appendTier(text, ranking, tagger.config().tierFormat);
+        return text.build().toLegacyString();
+    }
+
     static String line(TierTagger tagger, GameMode mode, Ranking ranking) {
         Text.Builder text = Text.builder();
         tagger.tagBuilder().appendIcon(text, mode, tagger.config().icons);
