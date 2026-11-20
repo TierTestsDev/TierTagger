@@ -1,18 +1,5 @@
 # Changelog
 
-## 2.1.0
-
-### New
-
-- **Ornithe** support: Tier Tagger now runs on Fabric for Minecraft 1.8.9 through [Ornithe](https://ornithemc.net), and works in [OneClient](https://polyfrost.org/projects/oneclient) alongside its nametag and performance mods.
-- Gamemode icons on 1.8.9, in nametags, the tab list, the lookup popup and player search.
-- Real icons for the Tier Tests legacy gamemodes (Bedfight, Bedwars, Boxing, Bridge, Build UHC, Emerald Rush, Fireball Fight, No Debuff and Sumo) on every version.
-
-### Fixed
-
-- Gamemodes without an icon showed broken symbols on 1.8.9.
-- Dark gamemode colors, like No Debuff's, were hard to read in the popup and player search.
-
 ## 2.0.0
 
 A rewrite of the whole mod. Your settings carry over automatically.
@@ -22,8 +9,11 @@ A rewrite of the whole mod. Your settings carry over automatically.
 - **MCPVP** tier list, including its middle tiers (HT, MT, LT).
 - **Tier Tests Legacy** list on every version, and modern lists on Forge 1.8.9.
 - Support for **Minecraft 26.3**.
+- **Ornithe** support: Tier Tagger now runs on Fabric for Minecraft 1.8.9 through [Ornithe](https://ornithemc.net), and works in [OneClient](https://polyfrost.org/projects/oneclient) alongside its nametag and performance mods.
+- Gamemode icons on 1.8.9, in nametags, the tab list, the lookup popup and player search.
+- Real icons for the Tier Tests legacy gamemodes (Bedfight, Bedwars, Boxing, Bridge, Build UHC, Emerald Rush, Fireball Fight, No Debuff and Sumo) on every version.
 - Forge 1.8.9 now has the same features as Fabric: two tags, every display mode, the lookup popup, player search and all tier lists. It uses Forge's own events, so it works with other 1.8.9 mods and clients.
-- Settings button in **Mod Menu** (Fabric) and Forge's mod list, and a `/tiertag` command on 1.8.9.
+- Settings button in **Mod Menu** (Fabric) and Forge's mod list, and a `/tiertag` command on Forge 1.8.9.
 - **Retired** tiers are marked with an R, and peak tiers are shown for every list that reports them.
 - Option to hide the Tier Tests badge.
 
@@ -39,6 +29,8 @@ A rewrite of the whole mod. Your settings carry over automatically.
 - The update check made a broken request first on every launch.
 - MCPVP search results could match the wrong player.
 - "Best tier" mode could show the selected gamemode instead of the best one.
+- Gamemodes without an icon showed broken symbols on 1.8.9.
+- Dark gamemode colors, like No Debuff's, were hard to read in the popup and player search.
 
 ### Faster
 
