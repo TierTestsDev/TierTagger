@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "tiertag-gametest",
+  "version": "1.0.0",
+  "name": "Tier Tagger client tests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": ["com.tiertests.tiertagger.test.ClientSmokeTest"]
+  },
+  "depends": {
+    "tiertag": "*"
+  }
+}

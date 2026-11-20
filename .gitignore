@@ -1,0 +1,44 @@
+# Gradle
+.gradle/
+.kotlin/
+build/
+out/
+
+# Loom and Stonecutter
+run/
+versions/*/build/
+versions/*/.gradle/
+legacy/run/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+*.launch
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and crash dumps
+logs/
+*.log
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
+
+# Local secrets and tooling
+.env
+.env.*
+*.secret
+.claude/
+.agents/
+CLAUDE.md
+AGENTS.md

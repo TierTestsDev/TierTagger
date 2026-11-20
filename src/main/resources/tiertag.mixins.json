@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.tiertests.tiertagger.mixin",
+  "compatibilityLevel": "JAVA_${java}",
+  "client": [
+    "EntityRendererMixin",
+    "MultiPlayerGameModeMixin",
+    "PlayerMixin",
+    "PlayerTabOverlayMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

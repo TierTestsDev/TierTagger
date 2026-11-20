@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "Shows PvP tiers from Tier Tests, MCTiers, PvPTiers, SubTiers and MCPVP in nametags and the tab list.",
+  "authors": ["Blue_Bed", "MrDrak", "xFlxme"],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/tiertests",
+    "sources": "https://github.com/TierTestsDev/TierTagger",
+    "issues": "https://github.com/TierTestsDev/TierTagger/issues"
+  },
+  "license": "MPL-2.0",
+  "icon": "assets/tiertag/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.tiertests.tiertagger.fabric.TierTaggerFabric"],
+    "modmenu": ["com.tiertests.tiertagger.fabric.ModMenuIntegration"]
+  },
+  "mixins": ["tiertag.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.15",
+    "minecraft": "${minecraft}",
+    "java": ">=${java}",
+    "fabric-api": "*"
+  }
+}

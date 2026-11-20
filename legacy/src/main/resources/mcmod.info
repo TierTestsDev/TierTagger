@@ -1,0 +1,14 @@
+[
+  {
+    "modid": "${modid}",
+    "name": "Tier Tagger",
+    "description": "Shows PvP tiers from Tier Tests and other tier lists in nametags and the tab list.",
+    "version": "${version}",
+    "mcversion": "1.8.9",
+    "url": "https://modrinth.com/mod/tiertests",
+    "authorList": ["Blue_Bed", "MrDrak", "xFlxme"],
+    "logoFile": "assets/tiertag/icon.png",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

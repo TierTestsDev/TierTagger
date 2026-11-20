@@ -1,0 +1,21 @@
+stonecutter active "26.3-fabric"
+
+stonecutter parameters {
+    val (version, loader) = current.project.split('-', limit = 2)
+
+    properties {
+        tags(version, loader)
+    }
+
+    constants {
+        match(loader, "fabric")
+    }
+
+    swaps["mod_version"] = "\"${properties["mod.version"]}\";"
+
+    replacements {
+        string(current.parsed >= "1.21.11") {
+            replace("ResourceLocation", "Identifier")
+        }
+    }
+}
