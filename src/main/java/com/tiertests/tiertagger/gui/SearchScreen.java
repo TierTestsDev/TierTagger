@@ -2,6 +2,7 @@ package com.tiertests.tiertagger.gui;
 
 import com.tiertests.tiertagger.core.LookupResult;
 import com.tiertests.tiertagger.core.TierTagger;
+import com.tiertests.tiertagger.core.model.Colors;
 import com.tiertests.tiertagger.core.model.GameMode;
 import com.tiertests.tiertagger.core.model.PlayerProfile;
 import com.tiertests.tiertagger.core.model.Ranking;
@@ -228,13 +229,13 @@ public final class SearchScreen extends BaseScreen {
     }
 
     private void drawTier(Gfx gfx, int x, int y, int w, GameMode mode, Ranking ranking) {
-        int color = Theme.opaque(mode.color());
+        int color = Theme.opaque(Colors.readable(mode.color()));
         gfx.roundRect(x, y, w, PILL_H, Theme.blend(Theme.PANEL_LIGHT, color, 0.15f));
         gfx.fill(x, y + 2, x + 2, y + PILL_H - 2, color);
 
         Text.Builder label = Text.builder();
         tagger.tagBuilder().appendIcon(label, mode, tagger.config().icons);
-        label.append(mode.title(), mode.color());
+        label.append(mode.title(), Colors.readable(mode.color()));
         int textY = y + (PILL_H - 8) / 2;
         gfx.text(Components.of(label.build()), x + 6, textY, Theme.TEXT, false);
 

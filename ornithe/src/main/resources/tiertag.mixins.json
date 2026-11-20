@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.tiertests.tiertagger.ornithe.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "ClientPlayerInteractionManagerMixin",
+    "GameGuiMixin",
+    "LivingEntityRendererMixin",
+    "PlayerTabOverlayMixin",
+    "TextRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

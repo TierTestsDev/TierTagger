@@ -66,10 +66,12 @@ class TagBuilderTest {
     }
 
     @Test
-    void showsRankAndFallsBackToSymbols() {
+    void showsRankAndOnlyUsesSymbolsWhenAsked() {
         TaggerConfig config = new TaggerConfig();
         assertEquals("#42", builder.slot(builder.pick(profile(SWORD, Tier.HT1), SWORD, DisplayMode.RANK, null), config).plain());
         config.icons = IconStyle.PIXEL;
+        assertEquals("HT1", builder.slot(builder.pick(profile(SWORD, Tier.HT1), SWORD, DisplayMode.BEST, null), config).plain());
+        config.icons = IconStyle.CLASSIC;
         assertEquals("⚔ HT1", builder.slot(builder.pick(profile(SWORD, Tier.HT1), SWORD, DisplayMode.BEST, null), config).plain());
     }
 }

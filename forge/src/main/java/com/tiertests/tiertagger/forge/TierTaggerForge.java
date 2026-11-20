@@ -3,6 +3,9 @@ package com.tiertests.tiertagger.forge;
 import com.tiertests.tiertagger.core.Log;
 import com.tiertests.tiertagger.core.Platform;
 import com.tiertests.tiertagger.core.TierTagger;
+import com.tiertests.tiertagger.core.model.ModeKind;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -10,6 +13,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
@@ -54,6 +58,9 @@ public final class TierTaggerForge {
             }
         });
         TierTagger.start(new ForgePlatform(configDir, version));
+        byte[] glyphSizes = ReflectionHelper.getPrivateValue(FontRenderer.class, Minecraft.getMinecraft().fontRendererObj,
+                "glyphWidth", "field_78287_e");
+        ModeKind.markGlyphWidths(glyphSizes);
 
         configKey = key("key.tiertag.openconfig", Keyboard.KEY_N);
         lookupKey = key("key.tiertag.lookup", Keyboard.KEY_U);
@@ -105,7 +112,7 @@ public final class TierTaggerForge {
 
         @Override
         public boolean supportsIconFont() {
-            return false;
+            return true;
         }
     }
 }

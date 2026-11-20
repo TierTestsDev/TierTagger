@@ -1,14 +1,15 @@
-package com.tiertests.tiertagger.forge.gui;
+package com.tiertests.tiertagger.ornithe.gui;
 
 import com.tiertests.tiertagger.core.LookupResult;
 import com.tiertests.tiertagger.core.TierTagger;
+import com.tiertests.tiertagger.core.model.Colors;
 import com.tiertests.tiertagger.core.model.GameMode;
 import com.tiertests.tiertagger.core.model.PlayerProfile;
 import com.tiertests.tiertagger.core.model.Ranking;
 import com.tiertests.tiertagger.core.source.TierList;
 import com.tiertests.tiertagger.core.text.Text;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.render.Window;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 /** The popup in the top-left corner that shows one player's tiers after pressing a lookup key. */
-public final class LegacyLookupHud {
+public final class LookupHud {
     private static final long SHOW_MS = 6000;
     private static final long COOLDOWN_MS = 500;
     private static final int MARGIN = 6;
@@ -34,7 +35,7 @@ public final class LegacyLookupHud {
     private static long requestedAt;
     private static int generation;
 
-    private LegacyLookupHud() {
+    private LookupHud() {
     }
 
     public static void lookup(UUID target, String targetName) {
@@ -51,7 +52,7 @@ public final class LegacyLookupHud {
         tagger.lookup(target, targetName).whenComplete(new BiConsumer<LookupResult, Throwable>() {
             @Override
             public void accept(final LookupResult found, Throwable error) {
-                Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                Minecraft.getInstance().executeTask(new Runnable() {
                     @Override
                     public void run() {
                         if (request != generation) return;
@@ -100,7 +101,7 @@ public final class LegacyLookupHud {
         if (tagger.config().showRegion && profile.region() != null) title += " §8[" + profile.region().code() + "]";
         String subtitle = "§7" + (profile.rank() > 0 ? "#" + profile.rank() + " " : "") + "§8(" + list.displayName() + ")";
 
-        int screenHeight = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
+        int screenHeight = (int) new Window(Minecraft.getInstance()).getScaledHeight();
         int maxLines = Math.max(1, (screenHeight - BOTTOM_CLEARANCE - MARGIN - PADDING * 2 - 28) / LINE);
         List<String> lines = new ArrayList<String>();
         int total = profile.rankings().size();
@@ -134,7 +135,7 @@ public final class LegacyLookupHud {
     static String line(TierTagger tagger, GameMode mode, Ranking ranking) {
         Text.Builder text = Text.builder();
         tagger.tagBuilder().appendIcon(text, mode, tagger.config().icons);
-        text.append(mode.title() + " ", mode.color());
+        text.append(mode.title() + " ", Colors.readable(mode.color()));
         tagger.tagBuilder().appendTier(text, ranking, tagger.config().tierFormat);
         if (ranking.hasHigherPeak()) {
             text.append(" (peak ", 0xAAAAAA).append(ranking.peak().format(tagger.config().tierFormat), ranking.peak().color())

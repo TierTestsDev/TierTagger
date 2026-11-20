@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.1.0
+
+### New
+
+- **Ornithe** support: Tier Tagger now runs on Fabric for Minecraft 1.8.9 through [Ornithe](https://ornithemc.net), and works in [OneClient](https://polyfrost.org/projects/oneclient) alongside its nametag and performance mods.
+- Gamemode icons on 1.8.9, in nametags, the tab list, the lookup popup and player search.
+- Real icons for the Tier Tests legacy gamemodes (Bedfight, Bedwars, Boxing, Bridge, Build UHC, Emerald Rush, Fireball Fight, No Debuff and Sumo) on every version.
+
+### Fixed
+
+- Gamemodes without an icon showed broken symbols on 1.8.9.
+- Dark gamemode colors, like No Debuff's, were hard to read in the popup and player search.
+
 ## 2.0.0
 
 A rewrite of the whole mod. Your settings carry over automatically.

@@ -2,6 +2,7 @@ package com.tiertests.tiertagger.gui;
 
 import com.tiertests.tiertagger.core.LookupResult;
 import com.tiertests.tiertagger.core.TierTagger;
+import com.tiertests.tiertagger.core.model.Colors;
 import com.tiertests.tiertagger.core.model.GameMode;
 import com.tiertests.tiertagger.core.model.PlayerProfile;
 import com.tiertests.tiertagger.core.model.Ranking;
@@ -136,7 +137,7 @@ public final class LookupHud {
     static Component line(TierTagger tagger, GameMode mode, Ranking ranking) {
         Text.Builder text = Text.builder();
         tagger.tagBuilder().appendIcon(text, mode, tagger.config().icons);
-        text.append(mode.title() + " ", mode.color());
+        text.append(mode.title() + " ", Colors.readable(mode.color()));
         tagger.tagBuilder().appendTier(text, ranking, tagger.config().tierFormat);
         if (ranking.hasHigherPeak()) {
             text.append(" (peak ", 0xAAAAAA).append(ranking.peak().format(tagger.config().tierFormat), ranking.peak().color())

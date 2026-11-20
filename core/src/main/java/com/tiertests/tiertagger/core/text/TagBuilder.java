@@ -100,13 +100,19 @@ public final class TagBuilder {
         return text.build();
     }
 
+    /**
+     * Pixel icons need the mod's icon font; where there is none (1.8.9) the text gets no icon and screens
+     * draw the icon as a texture instead. The classic style uses plain unicode symbols everywhere.
+     */
     public void appendIcon(Text.Builder text, GameMode mode, IconStyle style) {
         if (mode == null || style == IconStyle.NONE) return;
         char glyph = mode.kind().glyph();
         if (style == IconStyle.PIXEL && iconFont && glyph != 0) {
             text.icon(glyph);
-        } else {
+        } else if (style == IconStyle.CLASSIC || iconFont) {
             text.append(String.valueOf(mode.kind().symbol()), mode.color());
+        } else {
+            return;
         }
         text.append(" ", -1);
     }

@@ -34,8 +34,9 @@ On Forge 1.8.9, `/tiertag` opens the settings and `/tiertag <name>` searches a p
 |---|---|
 | Fabric | 1.21 to 1.21.11, 26.1, 26.2, 26.3 |
 | Forge | 1.8.9 |
+| [Ornithe](https://ornithemc.net) (Fabric for old versions) | 1.8.9 |
 
-Downloads are on [Modrinth](https://modrinth.com/mod/tiertests). The Fabric version needs [Fabric API](https://modrinth.com/mod/fabric-api).
+Downloads are on [Modrinth](https://modrinth.com/mod/tiertests). The Fabric version needs [Fabric API](https://modrinth.com/mod/fabric-api) and the Ornithe version needs [Ornithe Standard Libraries](https://modrinth.com/mod/osl). The Ornithe version also works in [OneClient](https://polyfrost.org/projects/oneclient).
 
 ## Building
 
@@ -50,7 +51,14 @@ Jars end up in `versions/<minecraft>-fabric/build/libs/`. To build one version, 
 Forge 1.8.9 is a separate Gradle build, because its toolchain needs an older Gradle. Run it with JDK 17 or 21:
 
 ```sh
-cd legacy
+cd forge
+./gradlew build
+```
+
+Ornithe 1.8.9 is a separate Gradle build as well. Run it with JDK 25:
+
+```sh
+cd ornithe
 ./gradlew build
 ```
 
@@ -59,7 +67,9 @@ cd legacy
 ```
 core/       Plain Java 8 library: tier list APIs, caching, config and tag text. No Minecraft code.
 src/        Fabric mod for every modern version, kept in one source tree with Stonecutter.
-legacy/     Forge 1.8.9 mod.
+forge/      Forge 1.8.9 mod.
+ornithe/    Ornithe (Fabric) 1.8.9 mod.
+gradle/     Shared build logic, such as the 1.8.9 icon font.
 ```
 
 The core does all the work that does not depend on the game: fetching, parsing, caching, choosing which tier to show and building the styled tag text. Each platform only has to draw that text and wire up its events, so porting Tier Tagger to another client or loader means writing a thin adapter around `core`.

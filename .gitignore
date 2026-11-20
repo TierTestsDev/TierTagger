@@ -8,7 +8,8 @@ out/
 run/
 versions/*/build/
 versions/*/.gradle/
-legacy/run/
+forge/run/
+ornithe/run/
 
 # IDEs
 .idea/

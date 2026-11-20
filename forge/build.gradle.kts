@@ -28,6 +28,8 @@ sourceSets.main {
     output.setResourcesDir(java.classesDirectory)
 }
 
+apply(from = rootDir.resolve("../gradle/legacy-font.gradle.kts"))
+
 loom {
     runConfigs {
         remove(getByName("server"))

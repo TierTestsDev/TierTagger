@@ -33,9 +33,13 @@ jobs:
         run: ./gradlew build publishMods --stacktrace
 
       - name: Build and publish Forge 1.8.9
-        working-directory: legacy
+        working-directory: forge
         env:
           JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+        run: ./gradlew build publishMods --stacktrace
+
+      - name: Build and publish Ornithe 1.8.9
+        working-directory: ornithe
         run: ./gradlew build publishMods --stacktrace
 
       - name: Release notes
@@ -49,4 +53,5 @@ jobs:
           body_path: release-notes.md
           files: |
             versions/*/build/libs/*.jar
-            legacy/build/libs/*.jar
+            forge/build/libs/*.jar
+            ornithe/build/libs/*.jar

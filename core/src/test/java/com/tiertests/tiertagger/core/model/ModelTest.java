@@ -18,6 +18,8 @@ class ModelTest {
         assertEquals(ModeKind.CRYSTAL, ModeKind.of("vanilla"));
         assertEquals(ModeKind.EARLY_GAME, ModeKind.of("early-game"));
         assertEquals(ModeKind.BRIDGE, ModeKind.of("bridge"));
+        assertEquals(ModeKind.BEDFIGHT, ModeKind.of("BEDFIGHT"));
+        assertEquals("tiertests/nodebuff", ModeKind.of("nodebuff").texture());
         assertEquals(ModeKind.OTHER, ModeKind.of("parkour"));
         assertTrue(new GameMode("neth_pot", null).isSameKind(new GameMode("nethop", null)));
         assertFalse(new GameMode("parkour", null).isSameKind(new GameMode("archery", null)));
@@ -55,6 +57,8 @@ class ModelTest {
         assertEquals(0xAA0000, Colors.byName("dark_red"));
         assertEquals(0xFF0000, Colors.parseHex("#FF0000"));
         assertEquals('c', Colors.nearestLegacyCode(0xFF4444));
+        assertEquals(0xFF5555, Colors.readable(0xFF5555));
+        assertTrue(Colors.readable(0x0000AA) != 0x0000AA);
     }
 
     @Test

@@ -52,6 +52,17 @@ public final class Colors {
         return index < 0 ? -1 : LEGACY[index];
     }
 
+    /** Lightens colors too dark to read on the mod's dark panels, keeping their hue. */
+    public static int readable(int rgb) {
+        int r = rgb >> 16 & 0xFF;
+        int g = rgb >> 8 & 0xFF;
+        int b = rgb & 0xFF;
+        double luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0;
+        if (luminance >= 0.35) return rgb;
+        double mix = 0.45;
+        return (int) (r + (255 - r) * mix) << 16 | (int) (g + (255 - g) * mix) << 8 | (int) (b + (255 - b) * mix);
+    }
+
     /** Closest of the sixteen chat colors as its code character (0-9, a-f). */
     public static char nearestLegacyCode(int rgb) {
         int best = 15;
