@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.Identifier;
 //? if >=1.21.9 {
 import net.minecraft.world.entity.player.PlayerModelType;
@@ -96,17 +95,18 @@ public final class Skins {
         /*return skin.model() == PlayerSkin.Model.SLIM;*/
     }
 
-    /** The skin if known, the default skin if it could not be looked up, or null while it loads. */
+    /**
+     * The skin if known; otherwise starts resolving it and returns null. A failed lookup is retried
+     * later rather than replaced by a default skin, so nobody is shown with someone else's look.
+     */
     public static PlayerSkin skin(UUID uuid) {
         if (uuid == null) return null;
         ClientPacketListener connection = Minecraft.getInstance().getConnection();
         PlayerInfo info = connection == null ? null : connection.getPlayerInfo(uuid);
         if (info != null) return info.getSkin();
         PlayerSkin known = resolved.get(uuid);
-        if (known != null) return known;
-        resolve(uuid);
-        Long state = pending.get(uuid);
-        return state != null && state != 0L ? DefaultPlayerSkin.get(uuid) : null;
+        if (known == null) resolve(uuid);
+        return known;
     }
 
     private static void resolve(UUID uuid) {
