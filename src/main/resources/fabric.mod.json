@@ -10,7 +10,7 @@
     "sources": "https://github.com/TierTestsDev/TierTagger",
     "issues": "https://github.com/TierTestsDev/TierTagger/issues"
   },
-  "license": "MPL-2.0",
+  "license": "GPL-3.0-only",
   "icon": "assets/tiertag/icon.png",
   "environment": "client",
   "entrypoints": {

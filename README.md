@@ -98,4 +98,4 @@ The client game test starts the game, creates a world and saves screenshots of t
 
 ## License
 
-[Mozilla Public License 2.0](LICENSE)
+[GNU General Public License v3.0](LICENSE)
